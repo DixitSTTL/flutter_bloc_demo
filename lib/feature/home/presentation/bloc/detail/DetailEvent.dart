@@ -26,3 +26,12 @@ class TimeFrameChanged extends DetailEvent {
   List<Object?> get props => [timeFrame,coinId];
 }
 
+class CommonDetailFetch extends DetailEvent {
+  final String coinId;
+
+  CommonDetailFetch(this.coinId);
+
+  @override
+  List<Object?> get props => [coinId];
+}
+

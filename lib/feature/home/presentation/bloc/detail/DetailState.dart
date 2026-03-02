@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../data/models/DetailChartModel.dart';
+import '../../../data/models/DetailCommonModel.dart';
 import '../../../data/models/HomeCoinModel.dart';
 import 'ChartTimeFrame.dart';
 
@@ -10,6 +11,7 @@ class DetailState extends Equatable {
   final String? error;
   final ChartTimeFrame? timeFrame;
   final String coinId;
+  final DetailCommonData? coinData;
 
 
   const DetailState({
@@ -18,15 +20,17 @@ class DetailState extends Equatable {
     this.error,
     this.coinId = '',
     this.timeFrame,
+    this.coinData,
   });
 
-  DetailState copyWith({bool? isLoading, List<ChartHistoryData>? coins, String? error, ChartTimeFrame? timeFrame, String? coinId}) {
+  DetailState copyWith({bool? isLoading, List<ChartHistoryData>? coins, String? error, ChartTimeFrame? timeFrame, String? coinId, DetailCommonData? coinData}) {
     return DetailState(
       isLoading: isLoading ?? this.isLoading,
       coins: coins ?? this.coins,
       error: error,
       timeFrame: timeFrame ?? this.timeFrame,
       coinId: coinId??this.coinId,
+      coinData: coinData ?? this.coinData,
     );
   }
 

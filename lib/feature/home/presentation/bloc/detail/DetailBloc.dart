@@ -12,6 +12,7 @@ class DetailBloc extends Bloc<DetailEvent, DetailState> {
   DetailBloc(this.repository) : super(const DetailState()) {
     on<CoinChartRequested>(_onGetCoinChart);
     on<TimeFrameChanged>(_onTimeFrameChange);
+    on<CommonDetailFetch>(_onCommonDetailFetch);
   }
 
   FutureOr<void> _onGetCoinChart(
@@ -43,6 +44,27 @@ class DetailBloc extends Bloc<DetailEvent, DetailState> {
 
       await _fetchChart(emit);
 
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, error: e.toString()));
+    }
+  }
+
+  Future<void> _onCommonDetailFetch(
+      CommonDetailFetch event,
+      Emitter<DetailState> emit,
+      ) async {
+    try {
+      emit(state.copyWith(coinId: event.coinId, isLoading: true));
+
+      final data = await repository.getCoinCommonDetail(event.coinId);
+
+      emit(
+        state.copyWith(
+          isLoading: false,
+          coinData: data.data,
+          error: null,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }

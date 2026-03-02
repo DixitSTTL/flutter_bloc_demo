@@ -3,6 +3,7 @@ import 'package:flutter_bloc_demo/feature/home/domain/repository/DetailRepositor
 import 'package:flutter_bloc_demo/feature/home/presentation/bloc/detail/ChartTimeFrame.dart';
 
 import '../datasource/DetailRemoteDataSource.dart';
+import '../models/DetailCommonModel.dart';
 
 class DetailRepositoryImpl implements DetailRepository {
   final DetailRemoteDataSource remote;
@@ -13,6 +14,15 @@ class DetailRepositoryImpl implements DetailRepository {
   Future<DetailChartModel> getCoinChart(String? coinUUID, ChartTimeFrame? timeFrame) async {
     try {
       return await remote.getCoinChart(coinUUID ,timeFrame);
+    } catch (e) {
+      throw Exception("error");
+    }
+  }
+
+  @override
+  Future<DetailCommonModel> getCoinCommonDetail(String? coinUUID) async {
+    try {
+      return await remote.getCoinCommonDetail(coinUUID);
     } catch (e) {
       throw Exception("error");
     }

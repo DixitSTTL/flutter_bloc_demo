@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import '../bloc/home/HomeBloc.dart';
 import '../bloc/home/HomeEvent.dart';
 import '../bloc/home/HomeState.dart';
+import '../widget/NetworkImage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -124,25 +125,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-    );
-  }
-}
-
-Widget networkImage(String url) {
-  if (url.endsWith('.svg')) {
-    return SvgPicture.network(
-      url,
-      height: 60,
-      width: 60,
-      placeholderBuilder: (_) => const CircularProgressIndicator(),
-    );
-  } else {
-    return Image.network(
-      url,
-      height: 60,
-      width: 60,
-      fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
     );
   }
 }
