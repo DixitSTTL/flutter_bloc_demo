@@ -29,7 +29,7 @@ class DetailRemoteDataSource {
       'v2/coin/$coinUUID/history',
       data: {
         'x-access-token':
-        "coinranking197d6c596b85998a5f498d684933a048fa5534a10ed2c856",
+        "coinranking6d3fc7d07b6098adcfcaaa8c702ef36d817b23632e4dd5e4",
       },
       queryParameters: {
         'timePeriod':
@@ -48,7 +48,7 @@ class DetailRemoteDataSource {
       'v2/coin/$coinUUID',
       data: {
         'x-access-token':
-        "coinranking197d6c596b85998a5f498d684933a048fa5534a10ed2c856",
+        "coinranking6d3fc7d07b6098adcfcaaa8c702ef36d817b23632e4dd5e4",
       }
     );
 

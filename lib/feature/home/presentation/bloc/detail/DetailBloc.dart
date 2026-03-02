@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc_demo/feature/home/data/models/DetailChartModel.dart';
 
 import '../../../domain/repository/DetailRepository.dart';
 import 'DetailEvent.dart';
@@ -10,25 +11,8 @@ class DetailBloc extends Bloc<DetailEvent, DetailState> {
   final DetailRepository repository;
 
   DetailBloc(this.repository) : super(const DetailState()) {
-    on<CoinChartRequested>(_onGetCoinChart);
     on<TimeFrameChanged>(_onTimeFrameChange);
     on<CommonDetailFetch>(_onCommonDetailFetch);
-  }
-
-  FutureOr<void> _onGetCoinChart(
-    CoinChartRequested event,
-    Emitter<DetailState> emit,
-  ) async {
-    try {
-      emit(state.copyWith(
-        isLoading: true,
-        coinId: event.coinId,
-      ));
-      await _fetchChart(emit);
-
-    } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString()));
-    }
   }
 
   Future<void> _onTimeFrameChange(
@@ -42,7 +26,12 @@ class DetailBloc extends Bloc<DetailEvent, DetailState> {
         isLoading: true,
       ));
 
-      await _fetchChart(emit);
+      final data= await _fetchChart();
+      emit(state.copyWith(
+        isLoading: false,
+        coins: data?.data?.history,
+        error: null,
+      ));
 
     } catch (e) {
       emit(state.copyWith(isLoading: false, error: e.toString()));
@@ -54,40 +43,33 @@ class DetailBloc extends Bloc<DetailEvent, DetailState> {
       Emitter<DetailState> emit,
       ) async {
     try {
-      emit(state.copyWith(coinId: event.coinId, isLoading: true));
-
+      emit(state.copyWith(coinId: event.coinId, isLoading: true, isRefresh:event.isRefresh));
       final data = await repository.getCoinCommonDetail(event.coinId);
-
+      final dataCart = await _fetchChart();
       emit(
         state.copyWith(
           isLoading: false,
           coinData: data.data,
+          coins: dataCart?.data?.history,
           error: null,
+          isRefresh: false,
         ),
       );
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString()));
+      emit(state.copyWith(isLoading: false, error: e.toString(),isRefresh: false));
     }
   }
 
 
-  Future<void> _fetchChart(Emitter<DetailState> emit) async {
+  Future<DetailChartModel?> _fetchChart() async {
     try {
       final data = await repository.getCoinChart(
         state.coinId,
         state.timeFrame, // pass timeframe to API
       );
-
-      emit(state.copyWith(
-        isLoading: false,
-        coins: data.data?.history,
-        error: null,
-      ));
+      return data;
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      ));
+      return null;
     }
   }
 

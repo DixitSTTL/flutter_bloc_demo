@@ -27,8 +27,7 @@ class _DetailPageState extends State<DetailPage> {
   void initState() {
     super.initState();
 
-    context.read<DetailBloc>().add(CommonDetailFetch(widget.coinId));
-    context.read<DetailBloc>().add(CoinChartRequested(widget.coinId));
+    context.read<DetailBloc>().add(CommonDetailFetch(widget.coinId, false));
   }
 
   @override
@@ -70,224 +69,237 @@ class _DetailPageState extends State<DetailPage> {
 
           return Stack(
             children: [
-              ListView(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsGeometry.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                networkImage(coinData?.iconUrl ?? ""),
-                                SizedBox(width: 20),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${coinData?.name ?? ''} (${coinData?.symbol ?? ''})',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 18,
-                                        color: Colors.black,
+              RefreshIndicator(
+                onRefresh: () async {
+                  context.read<DetailBloc>().add(
+                    CommonDetailFetch(widget.coinId, true),
+                  );
+                },
+                child: ListView(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsGeometry.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  networkImage(coinData?.iconUrl ?? ""),
+                                  SizedBox(width: 20),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${coinData?.name ?? ''} (${coinData?.symbol ?? ''})',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 18,
+                                          color: Colors.black,
+                                        ),
                                       ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          '\$${coinData?.price ?? '0'}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 18,
-                                            color: Colors.black,
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '\$${coinData?.price ?? '0'}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 18,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(width: 16),
-                                        Text(
-                                          '(${coinData?.change ?? '0'})',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 18,
-                                            color: coinCurrentChange == true
-                                                ? Colors.green
-                                                : Colors.red,
+                                          SizedBox(width: 16),
+                                          Text(
+                                            '(${coinData?.change ?? '0'})',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 18,
+                                              color: coinCurrentChange == true
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 30),
+
+                              Row(
+                                children: [
+                                  Text("MCap: "),
+                                  Text(
+                                    Formatters.formatMarketCap(
+                                      coinData?.marketCap,
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 30),
-
-                            Row(
-                              children: [
-                                Text("MCap: "),
-                                Text(
-                                  Formatters.formatMarketCap(
-                                    coinData?.marketCap,
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-
-                                SizedBox(width: 10),
-
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: parseColor(coinData?.color),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    '#${coinData?.rank ?? '-'}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      fontSize: 18,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10),
 
-                            Text(coinData?.description ?? ""),
-                            Text.rich(
-                              TextSpan(
-                                text: coinData?.websiteUrl ?? "",
-                                style: const TextStyle(
-                                  color: Colors.blueAccent,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    final url = Uri.parse(
-                                      coinData?.websiteUrl ?? "",
-                                    );
-                                    if (await canLaunchUrl(url)) {
-                                      await launchUrl(url);
-                                    }
-                                  },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 450,
-                        child: LineChart(
-                          LineChartData(
-                            minY: minY * 0.98,
-                            maxY: maxY * 1.02,
+                                  SizedBox(width: 10),
 
-                            backgroundColor: Colors.white,
-
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: false,
-                              getDrawingHorizontalLine: (value) =>
-                                  FlLine(color: Colors.white10, strokeWidth: 1),
-                            ),
-
-                            borderData: FlBorderData(show: false),
-
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 55,
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      value.toStringAsFixed(2),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: parseColor(coinData?.color),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      '#${coinData?.rank ?? '-'}',
                                       style: const TextStyle(
-                                        color: Colors.white54,
-                                        fontSize: 10,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  interval: _getBottomInterval(state),
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                      _formatBottomTitle(state, value.toInt()),
-                                      style: const TextStyle(
-                                        color: Colors.white54,
-                                        fontSize: 10,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-
-                            lineTouchData: LineTouchData(
-                              handleBuiltInTouches: true,
-                              touchTooltipData: LineTouchTooltipData(
-                                // tooltipBgColor: Colors.grey.shade900,
-                                getTooltipItems: (touchedSpots) {
-                                  return touchedSpots.map((spot) {
-                                    return LineTooltipItem(
-                                      "\$${spot.y.toStringAsFixed(2)}",
-                                      const TextStyle(
+                                        fontSize: 14,
                                         color: Colors.white,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w700,
                                       ),
-                                    );
-                                  }).toList();
-                                },
-                              ),
-                            ),
-
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: spots,
-                                isCurved: true,
-                                curveSmoothness: 0.3,
-                                barWidth: 3,
-                                color: trendColor,
-                                dotData: const FlDotData(show: false),
-                                belowBarData: BarAreaData(
-                                  show: true,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      trendColor.withOpacity(0.4),
-                                      trendColor.withOpacity(0.05),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
+                                    ),
                                   ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+
+                              Text(coinData?.description ?? ""),
+                              Text.rich(
+                                TextSpan(
+                                  text: coinData?.websiteUrl ?? "",
+                                  style: const TextStyle(
+                                    color: Colors.blueAccent,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () async {
+                                      final url = Uri.parse(
+                                        coinData?.websiteUrl ?? "",
+                                      );
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url);
+                                      }
+                                    },
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      TimeFrameSelector(
-                        selected: state.timeFrame ?? ChartTimeFrame.D7,
-                        onSelected: (timeFrame) {
-                          context.read<DetailBloc>().add(
-                            TimeFrameChanged(timeFrame, widget.coinId),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(
+                          height: 450,
+                          child: LineChart(
+                            LineChartData(
+                              minY: minY * 0.98,
+                              maxY: maxY * 1.02,
+
+                              backgroundColor: Colors.white,
+
+                              gridData: FlGridData(
+                                show: true,
+                                drawVerticalLine: true,
+                                getDrawingHorizontalLine: (value) => FlLine(
+                                  color: Colors.white10,
+                                  strokeWidth: 1,
+                                ),
+                              ),
+
+                              borderData: FlBorderData(show: false),
+
+                              titlesData: FlTitlesData(
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 55,
+                                    getTitlesWidget: (value, meta) {
+                                      return Text(
+                                        value.toStringAsFixed(2),
+                                        style: const TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 10,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    interval: _getBottomInterval(state),
+                                    getTitlesWidget: (value, meta) {
+                                      return Text(
+                                        _formatBottomTitle(
+                                          state,
+                                          value.toInt(),
+                                        ),
+                                        style: const TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 10,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                              lineTouchData: LineTouchData(
+                                handleBuiltInTouches: true,
+                                touchTooltipData: LineTouchTooltipData(
+                                  // tooltipBgColor: Colors.grey.shade900,
+                                  getTooltipItems: (touchedSpots) {
+                                    return touchedSpots.map((spot) {
+                                      return LineTooltipItem(
+                                        "\$${spot.y.toStringAsFixed(2)}",
+                                        const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
+                                ),
+                              ),
+
+                              lineBarsData: [
+                                LineChartBarData(
+                                  spots: spots,
+                                  isCurved: true,
+                                  curveSmoothness: 0.3,
+                                  barWidth: 2,
+                                  color: trendColor,
+                                  dotData: const FlDotData(show: false),
+                                  belowBarData: BarAreaData(
+                                    show: true,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        trendColor.withOpacity(0.4),
+                                        trendColor.withOpacity(0.05),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        TimeFrameSelector(
+                          selected: state.timeFrame ?? ChartTimeFrame.D7,
+                          onSelected: (timeFrame) {
+                            context.read<DetailBloc>().add(
+                              TimeFrameChanged(timeFrame, widget.coinId),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               if (state.isLoading)
                 const ColoredBox(

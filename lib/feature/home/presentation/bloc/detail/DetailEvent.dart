@@ -6,16 +6,6 @@ abstract class DetailEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class CoinChartRequested extends DetailEvent {
-  final String coinId;
-
-  CoinChartRequested(this.coinId);
-
-  @override
-  List<Object?> get props => [coinId];
-}
-
-
 class TimeFrameChanged extends DetailEvent {
   final ChartTimeFrame timeFrame;
   final String coinId;
@@ -28,10 +18,11 @@ class TimeFrameChanged extends DetailEvent {
 
 class CommonDetailFetch extends DetailEvent {
   final String coinId;
+  final bool isRefresh;
 
-  CommonDetailFetch(this.coinId);
+  CommonDetailFetch(this.coinId, this.isRefresh);
 
   @override
-  List<Object?> get props => [coinId];
+  List<Object?> get props => [coinId,isRefresh];
 }
 

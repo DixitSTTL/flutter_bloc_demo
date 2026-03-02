@@ -54,10 +54,6 @@ class _HomePageState extends State<HomePage> {
                     child:  InkWell(
                       borderRadius: BorderRadius.circular(12), // match card radius
                       onTap: () {
-                        print("Clicked: ${coin.name}");
-
-                        // Example navigation
-
                         Navigator.pushNamed(
                           context,
                           '/detail',
@@ -91,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                                     Padding(
                                       padding: EdgeInsets.all(10),
                                       child: Text(
-                                        coin.parseToDouble().toString(),
+                                          '\$${coin.parseToDouble() }',
                                       ),
                                     ),
                                     Padding(

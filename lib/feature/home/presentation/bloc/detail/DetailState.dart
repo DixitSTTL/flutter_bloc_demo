@@ -9,9 +9,10 @@ class DetailState extends Equatable {
   final bool isLoading;
   final List<ChartHistoryData> coins;
   final String? error;
-  final ChartTimeFrame? timeFrame;
+  final ChartTimeFrame timeFrame;
   final String coinId;
   final DetailCommonData? coinData;
+  final bool isRefresh;
 
 
   const DetailState({
@@ -19,11 +20,12 @@ class DetailState extends Equatable {
     this.coins = const [], // 👈 default empty list
     this.error,
     this.coinId = '',
-    this.timeFrame,
+    this.timeFrame = ChartTimeFrame.H1,
     this.coinData,
+    this.isRefresh = false,
   });
 
-  DetailState copyWith({bool? isLoading, List<ChartHistoryData>? coins, String? error, ChartTimeFrame? timeFrame, String? coinId, DetailCommonData? coinData}) {
+  DetailState copyWith({bool? isLoading, List<ChartHistoryData>? coins, String? error, ChartTimeFrame? timeFrame, String? coinId, DetailCommonData? coinData, bool? isRefresh}) {
     return DetailState(
       isLoading: isLoading ?? this.isLoading,
       coins: coins ?? this.coins,
@@ -31,6 +33,7 @@ class DetailState extends Equatable {
       timeFrame: timeFrame ?? this.timeFrame,
       coinId: coinId??this.coinId,
       coinData: coinData ?? this.coinData,
+      isRefresh: isRefresh ?? this.isRefresh,
     );
   }
 
